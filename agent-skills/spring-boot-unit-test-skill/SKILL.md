@@ -4,7 +4,12 @@ description: >
   专为 Spring Boot 项目（单体或微服务）自动生成并执行 JUnit 5 + Mockito 单元测试。（Spring Boot 业务接口单元测试生成器）
   针对业务接口（@Service 的 public 业务方法）生成正常逻辑 + 失败逻辑测试。  
   支持增量生成（已有测试的接口跳过）、按 Service 层逻辑划分测试类、单次不超过 15 个业务接口、分批计划、生成后询问是否执行测试、仅测试模式、标准化测试报告。
-
+license: MIT
+metadata:
+  author: renhao
+  version: 1.0
+  tags: github, release, backend, spring-boot
+  
 ---
 
 **触发关键词（用户输入任意之一即可激活）：**  
