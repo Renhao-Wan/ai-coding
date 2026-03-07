@@ -9,7 +9,6 @@ metadata:
   author: renhao
   version: 1.0
   tags: github, release, backend, spring-boot
-  
 ---
 
 **触发关键词（用户输入任意之一即可激活）：**  
@@ -104,5 +103,3 @@ metadata:
 - 用户随时可以说「停止」「下一批」「只测试 XXX」来中断或切换。
 
 **Skill 结束标志**：当报告生成后，自动结束本次 Skill 执行，并回复「已完成测试，生成的测试报告为test-report-XXXXXXXXX」
-
----
