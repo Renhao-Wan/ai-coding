@@ -26,20 +26,22 @@ metadata:
 
 ### 步骤 2：项目扫描与业务接口统计（必须完成）
 1. 检测构建工具（优先找 pom.xml → Maven；否则 build.gradle → Gradle）。
-2. 扫描 `src/main/java` 下所有带 `@Service` 注解的类。
-3. 提取「业务接口」定义：每个类的 **public 方法**（排除 getter/setter、toString、equals、hashCode 以及明显内部方法和非业务方法）。
-4. 检查 `src/test/java` 中对应测试类（包名镜像，例如 `com.example.service.UserService` → `com.example.service.UserServiceTest`）。
+2. 扫描 `pom.xml` 或 `build.gradle`，检查是否包含 `spring-boot-starter-test` 依赖。若未包含，必须先询问用户是否需要自动添加依赖。
+3. 扫描 `src/main/java` 下所有带 `@Service` 注解的类。
+4. 提取「业务接口」定义：每个类的 **public 方法**（排除 getter/setter、toString、equals、hashCode 以及明显内部方法和非业务方法）。
+5. 检查 `src/test/java` 中对应测试类（包名镜像，例如 `com.example.service.UserService` → `com.example.service.UserServiceTest`）。
    - 若测试类不存在 → 该业务接口全部需要生成。
    - 若测试类存在 → 解析所有 `@Test` 方法名，判断哪些业务方法已有测试覆盖（匹配 `testXXX`、`shouldXXX`、`XXXSuccess`、`XXXFail` 等命名）。
-5. 统计**需要生成测试的业务接口数量**（每个方法算 1 个）。
+   - 注意识别**多模块项目**。如果根目录下没有 src/main/java，请自动寻找包含 @Service 的子模块，并在该子模块对应的 src/test/java 中生成测试。
+6. 统计**需要生成测试的业务接口数量**（每个方法算 1 个）。
    - 如果用户指定了某些类/方法，只统计指定范围。
-   - 如果总数 **≤ 15** → 直接进入生成。
-   - 如果总数 **> 15** → 先输出分批计划，例如：
+   - 如果总数 **≤ 5** → 直接进入生成。
+   - 如果总数 **> 5** → 先输出分批计划，例如：
      ```
      【分批计划】
-     总共 28 个业务接口需要生成测试
-     批次 1（15 个）：UserService.login、UserService.register、OrderService.createOrder...
-     批次 2（13 个）：ProductService.getList...
+     总共 8 个业务接口需要生成测试
+     批次 1（5 个）：UserService.login、UserService.register、OrderService.createOrder...
+     批次 2（3 个）：ProductService.getList...
      请回复「继续生成批次1」或「全部自动分批」开始。
      ```
      每批生成完成后询问是否继续下一批。
@@ -52,10 +54,11 @@ metadata:
 - **每个业务接口必须包含**：
   - 至少 1 个正常逻辑测试（happy path）
   - 至少 1 个失败逻辑测试（异常、参数无效、空指针、业务异常等）
-  - 使用 `@Mock` + `@InjectMocks`（Service）或 `@MockBean` + `@Autowired`（Controller）
+  - 使用 `@Mock` + `@InjectMocks`（Service）
   - 使用 JUnit 5 `@Test`、`@DisplayName`、`@ParameterizedTest`（合适时）
   - Mockito `when(...).thenReturn(...)` / `thenThrow(...)`
   - 断言使用 `assertThat`（AssertJ，已包含在 spring-boot-starter-test 中）
+  - 严禁使用 @SpringBootTest，必须使用 `@ExtendWith(MockitoExtension.class)`，配合 `@InjectMocks (被测类)` 和 `@Mock (依赖类)`，保证测试秒级运行且无需加载 Spring 上下文。
   - 详细中文注释（说明测试场景）
 - 生成完一批后，**实际写入文件** 到 `src/test/java` 对应位置。
 - 每批生成完成后，总结「已生成 X 个测试类，Y 个测试方法」并询问是否继续下一批或「全部生成完成，是否开始执行测试？」。
@@ -66,6 +69,7 @@ metadata:
   - Maven 项目：`mvn test -Dtest=XXXTest -DfailIfNoTests=false`
   - Gradle 项目：`./gradlew test --tests XXXTest`
 - 记录每个测试类的通过/失败/跳过数量。
+- 如果在执行测试时遇到编译错误（如缺少依赖、找不到类）或测试运行失败，则跳过这次测试，记录在测试报告中，继续下一个类的测试。
 - 支持用户指定「只测试 UserServiceTest」或「只测试 login 方法」。
 
 ### 步骤 5：生成测试报告（每次测试完成后必做）
