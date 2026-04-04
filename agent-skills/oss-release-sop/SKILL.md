@@ -46,7 +46,9 @@ license: MIT
 #### 2.2 更新 CHANGELOG
 
 - 在项目根目录查找 `CHANGELOG.md`、`CHANGELOG`、`HISTORY.md` 等文件。
-- 如果找到，在文件顶部插入新版本的变更记录，格式如下：
+- 如果找到，在文件顶部插入新版本的变更记录，先看`CHANGELOG.md`、`CHANGELOG`、`HISTORY.md` 等文件是否有较为统一的格式，如果有则使用原文件的规范，如果没有则使用备用格式。
+
+备用格式如下：
 
 ```markdown
 ## [x.x.x] - YYYY-MM-DD
